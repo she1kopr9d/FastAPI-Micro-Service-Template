@@ -1,6 +1,9 @@
 mk-safe-start:
 	@if ! minikube status | grep -q "host: Running"; then minikube start; fi
 
+mk-safe-stop:
+	@if minikube status | grep -q "host: Running"; then minikube stop; fi
+
 docker-env:
 	@eval $$(minikube docker-env)
 
