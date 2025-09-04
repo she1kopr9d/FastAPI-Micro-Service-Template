@@ -1,5 +1,5 @@
 services:
-  db:
+  postgres-db:
     image: postgres:15
     ports:
       - "5433:5432"
@@ -41,7 +41,7 @@ services:
     env_file:
       - .env
     depends_on:
-      db:
+      postgres-db:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -54,7 +54,7 @@ services:
     env_file:
       - .env
     depends_on:
-      db:
+      postgres-db:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -67,7 +67,7 @@ services:
     env_file:
       - .env
     depends_on:
-      db:
+      postgres-db:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
