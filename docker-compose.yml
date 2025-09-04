@@ -34,7 +34,7 @@ services:
         retries: 10
 
   fastapi-app:
-    build: .
+    build: ./app
     command: uvicorn main:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
@@ -49,7 +49,7 @@ services:
       - .:/app
 
   celery-worker:
-    build: .
+    build: ./app
     command: celery -A celery_app.app worker --loglevel=info
     env_file:
       - .env
@@ -62,7 +62,7 @@ services:
       - .:/app
 
   celery-beat:
-    build: .
+    build: ./app
     command: celery -A celery_app.app beat --loglevel=info
     env_file:
       - .env

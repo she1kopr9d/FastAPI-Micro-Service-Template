@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-beat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-beat
+  template:
+    metadata:
+      labels:
+        app: celery-beat
+    spec:
+      containers:
+      - name: celery-beat
+        image: {{PROJECT_DIR}}-celery-beat:latest
+        imagePullPolicy: Never
+        command: ["celery", "-A", "celery_app.app", "beat", "--loglevel=info"]
+        envFrom:
+        - configMapRef:
+            name: app-env

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-worker
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+    spec:
+      containers:
+      - name: celery-worker
+        image: {{PROJECT_DIR}}-celery-worker:latest
+        imagePullPolicy: Never
+        command: ["celery", "-A", "celery_app.app", "worker", "--loglevel=info"]
+        envFrom:
+        - configMapRef:
+            name: app-env
