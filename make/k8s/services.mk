@@ -41,5 +41,17 @@ k8s-celery-beat-down:
 k8s-up-all: k8s-db-up k8s-rabbitmq-up k8s-fastapi-up k8s-celery-worker-up k8s-celery-beat-up
 	@echo "Все компоненты Kubernetes подняты."
 
-k8s-down-all: k8s-celery-beat-down k8s-celery-worker-down k8s-fastapi-down k8s-rabbitmq-down k8s-db-down
+k8s-down-all:
+	kubectl delete svc,deploy,job --all
 	@echo "Все компоненты Kubernetes остановлены."
+
+k8s-migrate:
+	@echo "🚀 Запускаем миграции Alembic в Kubernetes..."
+	@kubectl delete job alembic-migration --ignore-not-found
+	@kubectl apply -f $(K8S_DIR)/alembic-job.yaml
+	@echo "⌛ Ждём завершения миграций..."
+	@kubectl wait --for=condition=complete --timeout=120s job/alembic-migration || \
+		(kubectl logs job/alembic-migration && exit 1)
+	@echo "📜 Логи миграции:"
+	@kubectl logs job/alembic-migration
+	@echo "✅ Миграции успешно применены!"

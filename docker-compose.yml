@@ -46,7 +46,7 @@ services:
       rabbitmq:
         condition: service_healthy
     volumes:
-      - .:/app
+      - ./app:/app
 
   celery-worker:
     build: ./app
@@ -59,7 +59,7 @@ services:
       rabbitmq:
         condition: service_healthy
     volumes:
-      - .:/app
+      - ./app:/app
 
   celery-beat:
     build: ./app
@@ -72,7 +72,7 @@ services:
       rabbitmq:
         condition: service_healthy
     volumes:
-      - .:/app
+      - ./app:/app
 
 volumes:
   postgres_data:

@@ -34,5 +34,8 @@ k8s-logs:
 k8s-debug:
 	kubectl describe pod -l app=myapp -n default
 
-k8s-f:
+url:
 	kubectl port-forward svc/fastapi-app 8000:8000
+
+db-url:
+	kubectl port-forward svc/postgres-db 5433:5432

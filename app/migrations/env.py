@@ -5,6 +5,8 @@ from alembic import context
 from database.models import Base  # noqa
 from sqlalchemy import engine_from_config, pool
 
+import services.example_service.models  # noqa: F401
+
 config = context.config
 
 if config.config_file_name is not None:

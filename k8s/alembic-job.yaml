@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: alembic-migration
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: alembic
+        image: fastapi-micro-service-template-fastapi-app:latest
+        imagePullPolicy: Never
+        command: ["alembic", "upgrade", "head"]
+        envFrom:
+        - configMapRef:
+            name: app-env

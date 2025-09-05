@@ -1,3 +1,34 @@
+# PersistentVolume для хранения данных на хосте
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /Users/shelldev/minikube-data/postgres  # путь на Mac, создай эту папку заранее
+    type: DirectoryOrCreate
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+---
+# PersistentVolumeClaim для подключения к Deployment
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: postgres-pv
+  storageClassName: manual
+---
+# Deployment Postgres
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,6 +54,39 @@ spec:
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
       volumes:
       - name: postgres-data
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+---
+# Service для доступа к базе
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-db
+spec:
+  type: NodePort
+  selector:
+    app: postgres-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 30005
