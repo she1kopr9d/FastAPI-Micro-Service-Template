@@ -8,7 +8,7 @@
 - Структурированный код для масштабирования
 - Docker поддержка
 
-## Установка и запуск
+## Установка
 
 1. Клонируйте репозиторий:
    ```bash
@@ -16,15 +16,55 @@
    cd FastAPI-Micro-Service-Template
    ```
 
-2. Установите зависимости:
+## Работа через docker-compose
+
+1. Сделать билд
    ```bash
-   pip install -r requirements/prod.txt
+   make dc-build
    ```
 
-3. Запустите приложение:
+2. Запустить проект
    ```bash
-   make up
+   make dc-up
    ```
+
+3. Завершить проект
+   ```bash
+   make dc-down
+   ```
+
+4. Создать миграцию (спросит название миграции после)
+   ```
+   make dc-makemigration
+   ```
+
+## Работа через k8s (minikube)
+
+1. Запуск проекта
+   ```bash
+   make k8s-up
+   ```
+
+2. Выключение проекта
+   ```bash
+   make k8s-down
+   ```
+
+3. Применение миграции
+   ```
+   make k8s-migrate
+   ```
+
+4. Получение доступа с проекту
+   4.1. К серверу
+      ```bash
+      make url
+      ```
+   4.2. К базе данных
+      ```bash
+      make db-url
+      ```
+
 
 ## Фишки
 
@@ -67,3 +107,20 @@ import celery_app
 async def some_task(data: dict):
     pass
 ```
+
+## Требование для работоспособность модулей
+
+### Router
+
+- чтобы router корректно инициализировался в проекте, он должен быть в папке app/services/<название-сервиса>/
+- он должен наследоваться от дочерних классов utils.linked_routers.base_router.BaseRouter
+
+### Model
+
+- чтобы model корректно инициализировался в проекте, он должен быть импортирован в файле app/migrations/env.py
+
+   ```python
+   # app/migrations/env.py
+
+   import services.example_service.models  # noqa: F401
+   ```
